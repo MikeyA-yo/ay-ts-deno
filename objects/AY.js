@@ -4,7 +4,7 @@ const AY = {
         return typeof b;
     },
     os: Deno.build.os,
-    argv: Deno.args.slice(1)
+    argv: Deno.args
 };
 
 export { AY };

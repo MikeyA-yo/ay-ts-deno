@@ -3,9 +3,9 @@
 
 const out = './out.js'; // Using Deno.cwd() to get current working directory Deno.cwd().slice(2) + 
 const programName = Deno.args[0]; // Using Deno.args to get command line arguments
-const buf = new Uint8Array(2000)
-await Deno.openSync(programName).read(buf)
-const program = new TextDecoder().decode(buf);
+// const buf = new Uint8Array(2000)
+// await Deno.openSync(programName).read(buf)
+const program = Deno.readTextFileSync(programName)
 
 let code:string;
 
@@ -93,7 +93,6 @@ function generateCode(program: any) {
             values = parser(el)
         }
         values[values.length] = '\n';
-        console.log(values)
         for (let i = 0; i < values.length; i++) {
             if (values[i] == 'l') { 
                 values[i] = 'let'
