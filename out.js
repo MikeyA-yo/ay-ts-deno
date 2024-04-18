@@ -19,7 +19,8 @@ print(b2) ;
 print5() ; 
 let today = new Day() ; 
 let time = today.time() ; 
-print("hey, world!", d, b, c, a, time, today.getFullDate(), PI(), AY.type(AY.isAy), AY.argv[1]) ; 
+console.log(round(0.1+0.2))   ; 
+print("hey, world!", d, b, c, a, time, today.getFullDate(), PI(), AY.type(AY.isAy), AY.argv[1], AY.os) ; 
 }catch(e){
  console.error(e.message);
 }

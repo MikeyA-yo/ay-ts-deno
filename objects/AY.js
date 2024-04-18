@@ -4,7 +4,7 @@ const AY = {
         return typeof b;
     },
     os: Deno.build.os,
-    argv: Deno.args
+    argv: ['runcmd', ...Deno.args]
 };
 
 export { AY };
