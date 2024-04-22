@@ -15,12 +15,12 @@ console.log(b)   ;
 print(b2) ; 
 } 
 } 
-// timer(print5, 0) ; 
+// timer(print5, 0) , 
 print5() ; 
 let today = new Day() ; 
 let time = today.time() ; 
-console.log(round(0.1+0.2))   ; 
-print("hey, world!", d, b, c, a, time, today.getFullDate(), PI(), AY.type(AY.isAy), AY.argv[1], AY.os) ; 
+console.log(round(0.1+0.98987776555))   ; 
+print("hey, world!", d, b, c, a, time, today.getFullDate(), PI(), AY.type(AY.isAy), AY.argv[1], AY.os) 
 }catch(e){
  console.error(e.message);
 }

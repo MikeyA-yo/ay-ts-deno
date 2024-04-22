@@ -87,7 +87,7 @@ function generateCode(program: any) {
     }
 
     newLines.forEach(el => {
-        el.includes('{') ? el += '' : el.includes(';') ? el += '' : el.includes('}') ? el += '' : el += ';';
+        el.includes('{') ? el += '' : el.includes(';') ? el += '' : el.includes('}') ? el += '' : el.includes(',') ? el += '' :  el += ';';
         let values:RegExpMatchArray | never[] | string[] = parseStr(el);
         if (el.includes('for (') || el.includes('for(') || el.includes('if(') || el.includes('if (')) {
             values = parser(el)

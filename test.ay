@@ -15,11 +15,11 @@ f print5(){
    print(b2)
   } 
 }
-// timer(print5, 0)
+// timer(print5, 0) ,
 print5()
 l today = new Day()
 l time = today.time()
-print round(0.1+0.2)
+print round(0.1+0.98987776555)
 print("hey, world!", d, b, c, a, time, today.getFullDate(), PI(), AY.type(AY.isAy), AY.argv[1], AY.os) 
   
   
