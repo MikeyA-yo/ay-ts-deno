@@ -104,6 +104,21 @@ function generateCode(program: any) {
             if (values[i] == 'f') {
                 values[i] = 'function'
             }
+            if (values[i] == 'imp@') {
+                // let impe = imp(values, values[i]);
+                // values[i] = impe
+                const impStatementLength = values.length;
+               // const importForV = values[i + 1];
+                let importLocation = values[impStatementLength - 3]
+                const impLength = importLocation.length;
+                importLocation = importLocation.slice(1,(impLength - 1))
+                const ayImport = Deno.readTextFileSync(`.${importLocation}`);
+              //  console.log(values[i],values[impStatementLength - 3])
+                values[i] = '';
+                values[impStatementLength - 3] = '';
+         
+              code += generateCode(ayImport);
+            }
         }
         // switch case will only be used for error handling
         switch (values[0]) {

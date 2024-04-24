@@ -3,6 +3,10 @@ import {print, timer, Day, interval, read, write, appendFile, dirname} from './u
 import {AY} from './objects/AY.js';
  try {
 let a = "my program variables are nicely scoped" ; 
+for ( let i = 0; i < 10000; i++ ) { 
+console.log(i)   ; 
+} 
+  ; 
 let b = "hello world" ; 
 let c = 3 + 3 ; 
 let d = round(rand() * 12) ; 
