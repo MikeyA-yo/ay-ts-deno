@@ -73,6 +73,7 @@ function parseStr(inputString: string) {
 //     const matches = statement.match(regex);
 //     return matches;
 // }
+let exporters:string[] =[]
 function generateCode(program: any) {
     code = "";
     let lines = parse(program);
@@ -87,9 +88,9 @@ function generateCode(program: any) {
     }
 
     newLines.forEach(el => {
-        el.includes('{') ? el += '' : el.includes(';') ? el += '' : el.includes('}') ? el += '' : el.includes(',') ? el += '' :  el += ';';
+        el.includes('{') ? el += '' : el.includes(';') ? el += '' : el.includes('}') ? el += '' : el.includes(',') ? el += '' :  el += ' ;';
         let values:RegExpMatchArray | never[] | string[] = parseStr(el);
-        if (el.includes('for (') || el.includes('for(') || el.includes('if(') || el.includes('if (')) {
+        if (el.includes('for (') || el.includes('for(') || el.includes('if(') || el.includes('if (') || el.includes('exp@ f')) {
             values = parser(el)
         }
         values[values.length] = '\n';
@@ -104,20 +105,36 @@ function generateCode(program: any) {
             if (values[i] == 'f') {
                 values[i] = 'function'
             }
+            if (values[i] == 'exp@'){
+                exporters.push(values[i + 2]) // exported variable name to list of exported in a file
+                values[i] = ''
+            }
             if (values[i] == 'imp@') {
                 // let impe = imp(values, values[i]);
                 // values[i] = impe
                 const impStatementLength = values.length;
-               // const importForV = values[i + 1];
-                let importLocation = values[impStatementLength - 3]
+                // import for variable
+                const importForV = values[i + 1].slice(1,-1);
+                const endMark = impStatementLength - 3
+                // import location
+                let importLocation = values[endMark]
                 const impLength = importLocation.length;
                 importLocation = importLocation.slice(1,(impLength - 1))
-                const ayImport = Deno.readTextFileSync(`.${importLocation}`);
+                const ayImport = Deno.readTextFileSync(`${Deno.cwd()}${importLocation}`);
               //  console.log(values[i],values[impStatementLength - 3])
+              const dFr = values[2]
+              //  console.log(importForV,importLocation,values)
                 values[i] = '';
-                values[impStatementLength - 3] = '';
-         
-              code += generateCode(ayImport);
+                values[i + 1] = ''
+                values[2] = ''
+                values[endMark] = '';
+               if( importForV == importLocation){
+                   code += generateCode(ayImport);
+               }else{
+                  //to do actually make sure the file isn't loaded and executed
+                code += generateCode(ayImport);
+                console.log(`Variables defined: ${exporters}`)
+               }
             }
         }
         // switch case will only be used for error handling

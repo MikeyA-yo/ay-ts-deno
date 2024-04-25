@@ -1,3 +1,4 @@
-for (l i = 0; i < 10000; i++){
+for (l i = 0; i < 10; i++){
     print i
 }
+exp@ l no = 23
