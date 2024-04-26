@@ -1,6 +1,7 @@
 l a = "my program variables are nicely scoped"
-imp@ "no" from "/loop.ay"
-print no
+imp@ "tests" from "/loop.ay"
+
+print tests
 l b = "hello world"
 
 l c = 3 + 3

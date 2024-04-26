@@ -132,7 +132,7 @@ function generateCode(program: any) {
                    code += generateCode(ayImport);
                }else{
                   //to do actually make sure the file isn't loaded and executed
-                  let tempCode = generateCode(ayImport);
+                  const tempCode = generateCode(ayImport);
                   const math = `import {rand, round, PI, floor, exp, degToRad, radToDeg} from './math.ts';\n`;
                   const utils = `import {print, timer, Day, interval, read, write, appendFile, dirname} from './utils.js';\n`
                   const AY = `import {AY} from './objects/AY.js';\n`;
