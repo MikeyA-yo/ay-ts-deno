@@ -7,7 +7,7 @@ const programName = Deno.args[0]; // Using Deno.args to get command line argumen
 // await Deno.openSync(programName).read(buf)
 const program = Deno.readTextFileSync(programName)
 
-let code:string;
+
 
 // this function breaks the whole program into lines
 function parse(codes: string): string[] {
@@ -75,7 +75,7 @@ function parseStr(inputString: string) {
 // }
 let exporters:string[] =[]
 function generateCode(program: any) {
-    code = "";
+    let  code = "";
     let lines = parse(program);
     let newLines = lines.filter(line => {
         return line.trim() !== '';
@@ -107,7 +107,7 @@ function generateCode(program: any) {
             }
             if (values[i] == 'exp@'){
                 exporters.push(values[i + 2]) // exported variable name to list of exported in a file
-                values[i] = ''
+                values[i] = 'export'
             }
             if (values[i] == 'imp@') {
                 // let impe = imp(values, values[i]);
@@ -132,27 +132,37 @@ function generateCode(program: any) {
                    code += generateCode(ayImport);
                }else{
                   //to do actually make sure the file isn't loaded and executed
-                code += generateCode(ayImport);
-                console.log(`Variables defined: ${exporters}`)
+                  let tempCode = generateCode(ayImport);
+                  const math = `import {rand, round, PI, floor, exp, degToRad, radToDeg} from './math.ts';\n`;
+                  const utils = `import {print, timer, Day, interval, read, write, appendFile, dirname} from './utils.js';\n`
+                  const AY = `import {AY} from './objects/AY.js';\n`;
+                  const exec= ` ${math} ${utils} ${AY}  ${tempCode} `
+                  const out2 =import.meta.dirname + '/out2.js'
+                  Deno.writeTextFileSync(out2, exec)
+                  code += `import {${importForV}} from "./out2.js"`
+                  if(!exporters.includes(importForV)){
+                      console.log(exporters)
+                      console.log('No exports found')
+                     }
                }
             }
         }
         // switch case will only be used for error handling
-        switch (values[0]) {
-            case 'l':
-                values[0] = 'let';
+        // switch (values[0]) {
+        //     case 'l':
+        //         values[0] = 'let';
 
-                break;
-            case 'print':
-                values[0] = `console.log(${values[1]});`;
-                values[1] = ' '
-                break;
-            case 'f':
-                values[0] = `function`;
-                break;
-            default:
-              break ;
-        }
+        //         break;
+        //     case 'print':
+        //         values[0] = `console.log(${values[1]});`;
+        //         values[1] = ' '
+        //         break;
+        //     case 'f':
+        //         values[0] = `function`;
+        //         break;
+        //     default:
+        //       break ;
+        // }
        //  values = values.filter(value => value !== undefined || value !== null)
         code += values.join(" ");
     })
@@ -162,6 +172,6 @@ const math = `import {rand, round, PI, floor, exp, degToRad, radToDeg} from './m
 const utils = `import {print, timer, Day, interval, read, write, appendFile, dirname} from './utils.js';\n`
 const AY = `import {AY} from './objects/AY.js';\n`;
 const some = generateCode(program)
-const exec = `${math}${utils}${AY} try {\n${some}}catch(e){\n console.error(e.message);\n}`
+const exec = `${math}${utils}${AY} ${some} `
 Deno.writeTextFileSync(out, exec);
 import(out)
