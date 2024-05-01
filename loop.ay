@@ -2,4 +2,4 @@ for (l i = 0; i < 10; i++){
     print i
 }
 exp@ l no = 23
-exp@ l tests= 'hey'
+exp@ l tests = 'hey'
