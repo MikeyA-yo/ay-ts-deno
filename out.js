@@ -3,7 +3,7 @@ import {print, timer, Day, interval, read, write, appendFile, dirname} from './u
 import {AY} from './objects/AY.js';
  let a = "my program variables are nicely scoped" ; 
 import {tests} from "./out2.js"    ; 
-console.log(tests)   ; 
+console.log(tests.wow)   ; 
 let b = "hello world" ; 
 let c = 3 + 3 ; 
 let d = round(rand() * 12) ; 

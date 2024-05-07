@@ -5,5 +5,5 @@
 console.log(i)   ; 
 } 
 export let no = 23 ; 
-export let tests = 'hey' ; 
+export let tests = {hey:''} 
  

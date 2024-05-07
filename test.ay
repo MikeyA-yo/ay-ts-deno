@@ -1,7 +1,7 @@
 l a = "my program variables are nicely scoped"
 imp@ "tests" from "/loop.ay"
 
-print tests
+print tests.wow
 l b = "hello world"
 
 l c = 3 + 3

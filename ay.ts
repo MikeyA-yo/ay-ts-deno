@@ -1,5 +1,7 @@
 #!/usr/bin/env -S deno run -A
 
+import { objectChecker } from "./error_handling/objectChCompiled.js";
+
 
 const out = './out.js'; // Using Deno.cwd() to get current working directory Deno.cwd().slice(2) + 
 const programName = Deno.args[0]; // Using Deno.args to get command line arguments
@@ -176,5 +178,6 @@ const utils = `import {print, timer, Day, interval, read, write, appendFile, dir
 const AY = `import {AY} from './objects/AY.js';\n`;
 const some = generateCode(program)
 const exec = `${math}${utils}${AY} ${some} `
+objectChecker(some)
 Deno.writeTextFileSync(out, exec);
 import(out)
