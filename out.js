@@ -2,8 +2,9 @@ import {rand, round, PI, floor, exp, degToRad, radToDeg} from './math.ts';
 import {print, timer, Day, interval, read, write, appendFile, dirname} from './utils.js';
 import {AY} from './objects/AY.js';
  let a = "my program variables are nicely scoped" ; 
-import {tests} from "./out2.js"    ; 
-console.log(tests.wow)   ; 
+import { no,  tests} from "./out2.js"    
+console.log(tests.b)   ; 
+console.log(no)   ; 
 let b = "hello world" ; 
 let c = 3 + 3 ; 
 let d = round(rand() * 12) ; 

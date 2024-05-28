@@ -1,5 +1,4 @@
 
-import * as path from 'https://deno.land/std/path/mod.ts';
 
 function print(...a) {
     let b = '';
