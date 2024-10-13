@@ -157,7 +157,7 @@ function generateCode(program: any) {
           let importsForV: string[] = [];
           let condition: any;
           if (importForV.split(",").length > 1) {
-            importsForV = importForV.split(",");
+            importsForV = importForV.split(","); // ? .map((r) => r.trim())
             //for some reason every works in deno and some doesn't
             condition = exporters.every((r) => importsForV.includes(r));
             for (let i = 0; i < importsForV.length; i++) {
