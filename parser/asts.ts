@@ -1,10 +1,13 @@
 
+
 export enum ASTNodeType {
   Program,
   VariableDeclaration,
   Expression,
   Literal,
   Identifier,
+  NotExpression,
+  TernaryExpression,
   BinaryExpression,
   UnaryExpression,
   FunctionDeclaration,
@@ -12,16 +15,17 @@ export enum ASTNodeType {
 }
 type right = {
     type?:string;
+    name?:string;
     operator?:string;
     left?:{
         type?:string;
-        name?:string
+        value?:string
     };
     right?:right
 }
 type left = {
     type?:string;
-    name?:string
+    value?:string
 }
 type init = {
     type?:string;
