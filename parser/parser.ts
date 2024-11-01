@@ -1,13 +1,13 @@
 // deno-lint-ignore-file no-case-declarations no-explicit-any
 import { ASTNode, ASTNodeType } from "./asts.ts";
-import {  TokenGen, tokens, TokenType } from "./tokens.ts";
+import { TokenGen, tokens, TokenType } from "./tokens.ts";
 
 export class Parser {
   private tokenizer: TokenGen;
-  nodes: ASTNode[]
+  nodes: ASTNode[];
   constructor(file: string) {
     this.tokenizer = new TokenGen(file);
-    this.nodes = []
+    this.nodes = [];
   }
   consume() {
     const token = this.tokenizer.getCurrentToken();
@@ -18,17 +18,20 @@ export class Parser {
     let mGroup = group; // Initial grouping character ('(', '[', '{')
     const closingChar = group === "{" ? "}" : group === "[" ? "]" : ")"; // Determine the corresponding closing character
     this.consume(); // Move past the opening group character
-  
+
     while (this.tokenizer.getCurrentToken()?.value !== closingChar) {
       if (!this.tokenizer.getCurrentToken()) {
         throw new Error(`Unmatched grouping: expected ${closingChar}`);
       }
-  
+
       let currentGroup = "";
-  
+
       // Handle nested groups
       const currentTokenValue = this.tokenizer.getCurrentToken()?.value;
-      if (currentTokenValue === "(" || currentTokenValue === "[" || currentTokenValue === "{") {
+      if (
+        currentTokenValue === "(" || currentTokenValue === "[" ||
+        currentTokenValue === "{"
+      ) {
         currentGroup += this.groupBy(currentTokenValue); // Recursively handle nested groups
       } else if (currentTokenValue === "," || currentTokenValue === ";") {
         // Handle commas or semicolons (if present) within the group
@@ -37,10 +40,10 @@ export class Parser {
         // Handle regular tokens (numbers, identifiers, etc.)
         currentGroup += this.consume()?.value;
       }
-  
+
       mGroup += currentGroup;
     }
-  
+
     this.consume(); // Consume the closing character
     return mGroup + closingChar;
   }
@@ -51,74 +54,96 @@ export class Parser {
       value: token?.value,
     };
   }
-  parseBinaryExpression():any{
+  parseBinaryExpression(): any {
     let operator;
     const left = {
-      type:this.tokenizer.getCurrentToken()?.type || ASTNodeType.Literal,
-      value:this.tokenizer.getCurrentToken()?.value
-    }
+      type: this.tokenizer.getCurrentToken()?.type || ASTNodeType.Literal,
+      value: this.tokenizer.getCurrentToken()?.value,
+    };
     let right;
     let value;
-    this.consume();
-    if(this.tokenizer.getTokenLeftLine()?.length !== 0){
-      switch (this.tokenizer.getCurrentToken()?.type){
-        case TokenType.Operator:
-          // todo
-          switch(this.tokenizer.getCurrentToken()?.value){
-            case tokens.add:
-            case tokens.sub:
-            case tokens.div:
-            case tokens.mul:    
-              //todo arithmetric operations
-              operator = this.consume()?.value;
-              const token = this.tokenizer.getTokenLeftLine()
-              if(token){
-                 if(token.length > 1){
-                   right = this.parseBinaryExpression();
-                 }else{
-                  value = this.consume()
-                 }
+    const t = this.consume()?.type;
+    if (this.tokenizer.getTokenLeftLine()?.length !== 0) {
+      switch (t) {
+        case TokenType.Literal:
+          switch (this.tokenizer.getCurrentToken()?.type) {
+            case TokenType.Operator:
+              // todo
+              switch (this.tokenizer.getCurrentToken()?.value) {
+                case tokens.add:
+                case tokens.sub:
+                case tokens.div:
+                case tokens.mul:
+                  //todo arithmetric operations
+                  operator = this.consume()?.value;
+                  const token = this.tokenizer.getTokenLeftLine();
+                  if (token) {
+                    if (token.length > 1) {
+                      right = this.parseBinaryExpression();
+                    } else {
+                      value = this.consume();
+                    }
+                  }
+                  break;
+                default:
+                  // probably an error
               }
-              break
+              break;
             default:
-              // probably an error    
+              // another error only operators should be next, don't you think so too?
           }
-          break
-        default:
-          // another error only operators should be next, don't you think so too?  
+          break;
+        case TokenType.StringLiteral:
+          if (
+            this.tokenizer.getCurrentToken()?.value === "+" ||
+            this.tokenizer.getCurrentToken()?.value === ","
+          ) {
+            operator = "+"; // dynamically replace , to + for strings as this is a syntax in my lang such that l b = "i am cool" , "Yes" concats the strings
+            this.consume();
+            const token = this.tokenizer.getTokenLeftLine();
+            if (token) {
+              if (token.length > 1) {
+                right = this.parseBinaryExpression();
+              } else {
+                value = this.consume();
+              }
+            }
+          } else {
+            // error, almost everywhere an error exists i have to check whether they defined smth first
+          }
       }
     }
-    if(operator !== void 0 && right !== void 0){
+    if (operator !== void 0 && right !== void 0) {
       return {
         type: ASTNodeType.BinaryExpression,
         operator,
         left,
-        right
-      }
-    }else{
+        right,
+      };
+    } else {
       return {
         type: ASTNodeType.BinaryExpression,
         operator,
         left,
-        right: value
-      }
+        right: value,
+      };
     }
   }
-  parseNotnMinusExpression(){
+  parseNotnMinusExpression() {
     const val = this.consume()?.value ?? "";
     let initializer;
-    const leftTokens = this.tokenizer.getTokenLeftLine()
-    if (leftTokens){
-       if(leftTokens.length > 1){
+    const leftTokens = this.tokenizer.getTokenLeftLine();
+    if (leftTokens) {
+      if (leftTokens.length > 1) {
         //todo
-       }else {
-        initializer = val + this.consume()?.value 
-       }
+      } else {
+        initializer = val + this.consume()?.value;
+      }
     }
     return {
       type: ASTNodeType.NotExpression,
-      value:initializer
-    }
+      value: initializer,
+    };
   }
   parseVariable() {
     this.tokenizer.next();
@@ -127,60 +152,76 @@ export class Parser {
     if (this.tokenizer.getCurrentToken()?.type === TokenType.Identifier) {
       identifier = this.consume()?.value;
       //this check is used to know whether it's just a plain declaration, without any value initialised in the variable
-      if(this.tokenizer.getTokenLeftLine()?.length === 0){
+      if (this.tokenizer.getTokenLeftLine()?.length === 0) {
         return {
-          type:ASTNodeType.VariableDeclaration,
-          identifier
-        }
+          type: ASTNodeType.VariableDeclaration,
+          identifier,
+        };
       }
-      
+
       // here it is declaration and initialisation, so i have to check the type of value on the other side
       // to know how to go about parsing
       if (this.tokenizer.getCurrentToken()?.value === tokens.assign) {
         this.consume();
-        const leftTokenValues = this.tokenizer.getTokenLeftLine()?.map(t => t.value)
+        const leftTokenValues = this.tokenizer.getTokenLeftLine()?.map((t) =>
+          t.value
+        );
         switch (this.tokenizer.getCurrentToken()?.type) {
           case TokenType.Identifier:
             //todo
-            if(leftTokenValues?.length === 0){
+            if (leftTokenValues?.length === 0) {
               initializer = this.parseLiteral();
+            } else {
+              if (
+                this.tokenizer.peek()?.type === TokenType.Operator ||
+                this.tokenizer.peek()?.value === ","
+              ) {
+                initializer = this.parseBinaryExpression();
+              }
             }
             break;
           case TokenType.Literal:
             //todo
-            if(leftTokenValues?.length === 0){
+            if (leftTokenValues?.length === 0) {
               initializer = this.parseLiteral();
-            }else{
-              initializer = this.parseBinaryExpression()
+            } else {
+              initializer = this.parseBinaryExpression();
             }
             break;
           case TokenType.StringLiteral:
             //todo
-            if(leftTokenValues?.length === 0){
+            if (leftTokenValues?.length === 0) {
               initializer = this.parseLiteral();
+            } else {
+              initializer = this.parseBinaryExpression();
             }
             break;
           case TokenType.Punctuation:
             //todo
-            initializer = this.groupBy(this.tokenizer.getCurrentToken()?.value ?? "(")
+            initializer = this.groupBy(
+              this.tokenizer.getCurrentToken()?.value ?? "(",
+            );
             break;
           case TokenType.Operator:
-            if (this.tokenizer.getCurrentToken()?.value === tokens.not || this.tokenizer.getCurrentToken()?.value === tokens.sub ) {
+            if (
+              this.tokenizer.getCurrentToken()?.value === tokens.not ||
+              this.tokenizer.getCurrentToken()?.value === tokens.sub
+            ) {
               //todo
-              initializer = this.parseNotnMinusExpression()
+              initializer = this.parseNotnMinusExpression();
               break;
             } else {
               // another error, fallthrough
-              break
+              break;
             }
           default:
-          // an error (variable value can't be keyword or operator, but some things like () and [], {} may fall in punctuation which can be a variable)
+            // an error (variable value can't be keyword or operator, but some things like () and [], {} may fall in punctuation which can be a variable)
         }
         return {
           type: ASTNodeType.VariableDeclaration,
           identifier,
-          initializer
-        }
+          initializer,
+        };
       }
     }
   }
@@ -194,23 +235,25 @@ export class Parser {
             node && this.nodes.push(node);
             break;
           default:
-          //hehe
+            //hehe
         }
         break;
 
       default:
-      //Syntax Error Likely
+        //Syntax Error Likely
     }
   }
   start() {
-    // currently this.checkAndParse only executes line statements not blocks, 
+    // currently this.checkAndParse only executes line statements not blocks,
     //todo figure out how i'd do it with blocks
-    for (let i = 0; i < this.tokenizer.lines.length; i++){
+    for (let i = 0; i < this.tokenizer.lines.length; i++) {
       this.checkAndParse();
     }
   }
 }
 
-const p = new Parser("l b = 'my string'\nl c = 'another string test'\nl nothing=23.544 + 43");
+const p = new Parser(
+  "l b = 'my string'\nl c = 'another string', ' ','test'\nl nothing=23.544 + 43",
+);
 p.start();
-console.log(p.nodes)
+console.log(p.nodes);
